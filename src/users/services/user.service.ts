@@ -40,4 +40,9 @@ export class UserService {
         const findUser = await this.userRepository.findOne( { email });
         return findUser;
     }
+
+    public async getAllUsers () {
+        const users = await this.userRepository.find();
+        return users;
+    }
 }

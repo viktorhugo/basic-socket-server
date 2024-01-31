@@ -12,11 +12,13 @@ require('dotenv').config();
     MongooseModule.forFeature([{ name: User.name, schema: UserSchema }]),
     JwtModule.register({
       global: true,
-      secret: process.env.JWT_KEY,
-      signOptions: { expiresIn: '60s' },
+      secret: process.env.JWT_SECRET_KEY,
+      signOptions: { expiresIn: '24h' },
     }),
   ],
-  providers: [AuthService],
+  providers: [
+    AuthService,
+  ],
   controllers: [AuthController],
   exports:[AuthService]
 })

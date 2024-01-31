@@ -28,13 +28,33 @@ export class AuthService {
     }
 
     public async generateJWT( user ) {
-        const payload = { sub: user._id, email: user.email };
+
+        const payload = { uuid: user.uuid };
         const token = await this.jwtService.signAsync(payload)
         return {
             ok: true,
             user,
             token,
         };
+    }
+
+    public async renewToken( xToken: string ) {
+        let verifyToken;
+        try {
+            verifyToken = await this.jwtService.verifyAsync(
+                xToken, { secret: process.env.JWT_SECRET_KEY }
+            );
+            console.log(verifyToken);
+        } catch (error) {
+            // console.log(error);
+            throw new HttpException( { status: HttpStatus.UNAUTHORIZED, error: 'Wrong Token!' }, 401 );
+        }
+        const { uuid } = verifyToken;
+        if (!uuid) throw new HttpException( { status: HttpStatus.UNAUTHORIZED, error: 'Wrong uuid!' }, 401 );
+        const user = await this.userRepository.findOne({  _id : uuid });
+        console.log(user);
+        
+        return await this.generateJWT(user.toJSON());
     }
 
 }
