@@ -1,0 +1,179 @@
+@import url('https://fonts.googleapis.com/css?family=Questrial');
+
+body {
+  font-family: Helvetica;
+}
+
+:root {
+  --green-01: #87B729;
+  --green-02: #519E3B;
+  --green-03: #008948;
+  --green-04: #004F21;
+  --green-05: #195B2C;
+  --green-06: #D3E0B7;
+  --tan: #FFF0CD;
+}
+
+.frame {
+  display: grid;
+  justify-content: center;
+}
+
+.container {
+  width: 1180px;
+  height: auto;
+  display: grid;
+  grid-template-columns: repeat(5, 236px);
+  grid-template-rows: repeat(7, 236px);
+}
+
+#test {
+  fill: var(--lime-green);
+}
+
+#one-one {
+  background: #519E3B;
+}
+
+#one-two {
+  background: #004F21;
+}
+
+#one-three {
+  background: #FFF0CD;
+}
+
+#one-four {
+  background: #008948;
+}
+
+#one-five {
+  background: #87B729;
+}
+
+#two-one {
+  background: #008948;
+}
+
+#two-two {
+  background: #519E3B;
+}
+
+#two-three {
+  background: #008948;
+}
+
+#two-four {
+  background: #004F21;
+}
+
+#two-five {
+  background: #FFF0CD;
+}
+
+#three-one {
+  background: #004F21;
+}
+
+#three-two {
+  background: #FFF0CD;
+}
+
+#three-three {
+  background: #519E3B;
+}
+
+#three-four {
+  background: #87B729;
+}
+
+#three-five {
+  background: #008948;
+}
+
+#four-one {
+  background: #008948;
+}
+
+#four-two {
+  background: #519E3B;
+}
+
+#four-three {
+  background: #004F21;
+}
+
+#four-four {
+  background: #FFF0CD;
+}
+
+#four-five {
+  background: #519E3B;
+}
+
+#five-one {
+  background: #519E3B;
+  grid-row: 5 / span 3;
+}
+
+#five-two {
+  background: #87B729;
+  grid-row: 5 / span 3;
+}
+
+#five-three {
+  background: #008948;
+  grid-row: 5 / span 3;
+}
+
+#five-four {
+  background: #004F21;
+  grid-row: 5 / span 3;
+  grid-column: 4 / span 2;
+  padding: 24px;
+  position: relative;
+}
+
+#h1 {
+  color: var(--tan);
+  font-size: 48px;
+  font-weight: bold;
+  line-height: 1.1;
+}
+
+#h2 {
+  color: var(--green-01);
+  font-size: 48px;
+  font-weight: bold;
+  line-height: 1.1;
+}
+
+#h3 {
+  display: inline-block;
+  color: var(--tan);
+  font-size: 24px;
+  margin-top: 60px;
+  font-weight: bold;
+}
+
+#h4 {
+  display:block;
+  color: var(--green-01);
+  margin-top: 80px;
+  font-weight: bold;
+  font-size: 18px;
+}
+
+img {
+  transform: scale(0.3);
+  position: absolute;
+  bottom: -60px;
+  left: -140px;
+  
+}
+
+a {
+  font-size: 11px;
+  color: black;
+  float: right;
+}
