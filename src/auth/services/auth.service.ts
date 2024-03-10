@@ -15,7 +15,7 @@ export class AuthService {
     ) {}
 
     public async login(loginDto: LoginDto) {
-        console.log(loginDto);
+        // console.log(loginDto);
         
         const findUser = await this.userRepository.findOne({ email: loginDto.email });
         if (!findUser) throw new HttpException( { status: HttpStatus.BAD_REQUEST, error: 'User not exist!' }, 400 );
@@ -44,7 +44,7 @@ export class AuthService {
             verifyToken = await this.jwtService.verifyAsync(
                 xToken, { secret: process.env.JWT_SECRET_KEY }
             );
-            console.log(verifyToken);
+            // console.log(verifyToken);
         } catch (error) {
             // console.log(error);
             throw new HttpException( { status: HttpStatus.UNAUTHORIZED, error: 'Wrong Token!' }, 401 );
@@ -52,9 +52,38 @@ export class AuthService {
         const { uuid } = verifyToken;
         if (!uuid) throw new HttpException( { status: HttpStatus.UNAUTHORIZED, error: 'Wrong uuid!' }, 401 );
         const user = await this.userRepository.findOne({  _id : uuid });
-        console.log(user);
-        
+        // console.log(user);
         return await this.generateJWT(user.toJSON());
+    }
+
+    public async verifyTokenAndSetOnline( xToken: string ) {
+        let verifyToken;
+        
+        try {
+            verifyToken = await this.jwtService.verifyAsync(
+                xToken, { secret: process.env.JWT_SECRET_KEY }
+            );
+            // console.log(verifyToken);
+        } catch (error) {
+            // console.log(error);
+            return null;
+        }
+
+        const { uuid } = verifyToken;
+        if (!uuid) return false;
+        const user: User = await this.userRepository.findOne({  _id : uuid });
+        if (!user) return false;
+        user.online = true;
+        await this.userRepository.updateOne(user);
+        return user;
+    }
+
+    public async disconnect(user: User) {
+        const findUser: User = await this.userRepository.findOne({  _id : user['_id'] });
+        if (!findUser) return false;
+        user.online = false;
+        await this.userRepository.updateOne(user);
+        return true;
     }
 
 }

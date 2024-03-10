@@ -11,13 +11,13 @@ export class AuthController {
 
     @Public()
     @Post('login')
-    async login(@Request() req, @Body() loginDto: LoginDto) {
+    async login(@Request() req, @Body() loginDto: LoginDto) { // si se agrega el LoginDto verifica automaticamente que venga
         return await this.authService.login(loginDto); 
     }
 
     @Public()
-    @Get('renew')
-    async renewToken(@Request() req: Request, @Body() loginDto: LoginDto) {
+    @Get('token-renew')
+    async renewToken(@Request() req: Request) {
         const xToken: string = req.headers['x-token'];
         if (!xToken) throw new HttpException( { status: HttpStatus.BAD_REQUEST, error: 'missing token to renew!' }, 400 );
         return await this.authService.renewToken(xToken); 
