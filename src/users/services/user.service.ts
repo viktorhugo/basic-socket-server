@@ -41,8 +41,12 @@ export class UserService {
         return findUser;
     }
 
-    public async getAllUsers () {
-        const users = await this.userRepository.find();
+    public async getAllUsers (uuid, skip, take) {
+        const users = await this.userRepository
+            .find({ _id: {$ne: uuid}})
+            .sort('-online') //* el minus es para DESC O ASC
+            .skip(skip)
+            .limit(20)
         return users;
     }
 }

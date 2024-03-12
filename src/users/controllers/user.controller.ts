@@ -1,4 +1,4 @@
-import { Body, Controller, Delete, Get, Param, Post, Request } from '@nestjs/common';
+import { Body, Controller, Delete, Get, HttpException, HttpStatus, Param, Post, Request } from '@nestjs/common';
 import { Public } from 'src/meta/metadata';
 import { CreateUserDto, FindOneParams } from '../dto/user.dto';
 import { UserService } from '../services/user.service';
@@ -23,9 +23,11 @@ export class UserController {
     }
 
     // already AuthGuard
-    @Get('all-users')
-    public async getAllUsers(@Request() req) {
-        return await this.usersService.getAllUsers();
+    @Get('all-users/:skip/:take')
+    public async getAllUsers(@Request() req, @Param() skip, @Param() take) {
+        const uuid = req['uuid'];
+        if (!uuid) throw new HttpException( { status: HttpStatus.BAD_REQUEST, error: 'uuid not exist!' }, 400 );
+        return await this.usersService.getAllUsers(uuid, skip, take);
     }
 
     // already AuthGuard
