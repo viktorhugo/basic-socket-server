@@ -8,7 +8,6 @@ import {
 import { Socket } from 'dgram';
 import 'dotenv/config';
 import { AuthService } from 'src/auth/services/auth.service';
-import { User } from 'src/schemas/user.schema';
 import { Server } from 'ws';
     
 @WebSocketGateway( 
@@ -40,11 +39,13 @@ export class EventsGateway {
         if (!pr) return client.disconnect();
     }
 
-    public async AddClient(token: string, client) {
+    public async AddClient(token: string, client: Socket) {
         try {
             const user  = await this.authService.verifyTokenAndSetOnline(token);
             if (!user) return false;
-            client['user'] = user;
+            client['uuid'] = user['_id'].toString();
+            // console.log(client['uuid']);
+            // client.addListener()
             this.users.push(client);
             console.log(`Client connected, Total UsersConnected: ${this.users.length}`);
         } catch (error) {
@@ -55,25 +56,15 @@ export class EventsGateway {
     // method listen when client disconnected
     public async handleDisconnect(@ConnectedSocket() client: Socket) {
         // check if public api node
-        await this.authService.disconnect(client['user'] as User);
+        await this.authService.disconnect(client['uuid']);
+        this.users = this.users.filter(item => item['uuid'] !== client['uuid']);
         console.log(`Client Disconnected, Total UsersConnected: ${this.users.length}`);
     }
 
-    @SubscribeMessage('create-band')
-    handleEventCreateBand( @ConnectedSocket() client: Socket, @MessageBody() data: string,): string {
+    @SubscribeMessage('user-message')
+    handleEventCreateBand( @ConnectedSocket() client: Socket, @MessageBody() data: string,): void {
         console.log(data);
-        return data;
+        // return data;
     }
 
-    @SubscribeMessage('Delete-band')
-    handleEventDeleteBand( @ConnectedSocket() client: Socket, @MessageBody() data: string,): string {
-        console.log(data);
-        return data;
-    }
-
-    // @SubscribeMessage('create-band')
-    // public handleEventAddBand( client: Socket, message: any): string {
-    //     console.log(message, client);
-    //     return message;
-    // }
 }

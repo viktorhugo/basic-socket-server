@@ -47,6 +47,6 @@ export class UserService {
             .sort('-online') //* el minus es para DESC O ASC
             .skip(skip)
             .limit(20)
-        return users;
+        return {ok: true, users};
     }
 }

@@ -23,7 +23,7 @@ export class UserController {
     }
 
     // already AuthGuard
-    @Get('all-users/:skip/:take')
+    @Get('all-users?:skip')
     public async getAllUsers(@Request() req, @Param() skip, @Param() take) {
         const uuid = req['uuid'];
         if (!uuid) throw new HttpException( { status: HttpStatus.BAD_REQUEST, error: 'uuid not exist!' }, 400 );

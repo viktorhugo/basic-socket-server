@@ -78,11 +78,11 @@ export class AuthService {
         return user;
     }
 
-    public async disconnect(user: User) {
-        const findUser: User = await this.userRepository.findOne({  _id : user['_id'] });
+    public async disconnect(uuid: string) {
+        const findUser: User = await this.userRepository.findOne({  _id : uuid });
         if (!findUser) return false;
-        user.online = false;
-        await this.userRepository.updateOne(user);
+        findUser.online = false;
+        await this.userRepository.updateOne(findUser);
         return true;
     }
 
