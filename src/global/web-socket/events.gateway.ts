@@ -7,6 +7,7 @@ import {
 } from '@nestjs/websockets';
 import { Socket } from 'dgram';
 import 'dotenv/config';
+import { NewUserMessageDto, RequestUserMessageDto } from 'src/auth/dto/auth.dto';
 import { AuthService } from 'src/auth/services/auth.service';
 import { Server } from 'ws';
     
@@ -31,12 +32,18 @@ export class EventsGateway {
     }
 
     // validate Connection with webSocket
-    public async handleConnection(@ConnectedSocket() client: Socket, req: Request) {
+    public async handleConnection(@ConnectedSocket() client, req: Request) {
 
         const token = req.headers['x-token'];
-        if (!token) return client.disconnect();
-        const pr = this.AddClient(token, client);
-        if (!pr) return client.disconnect();
+        if (!token) {
+            console.error('Missing auth token for connection');
+            return client.close();
+        }
+        const pr = await this.AddClient(token, client);
+        if (!pr){
+            console.error('Error token expired');
+            return client.close();
+        } 
     }
 
     public async AddClient(token: string, client: Socket) {
@@ -48,6 +55,7 @@ export class EventsGateway {
             // client.addListener()
             this.users.push(client);
             console.log(`Client connected, Total UsersConnected: ${this.users.length}`);
+            return true;
         } catch (error) {
             return false;
         }
@@ -62,8 +70,23 @@ export class EventsGateway {
     }
 
     @SubscribeMessage('user-message')
-    handleEventCreateBand( @ConnectedSocket() client: Socket, @MessageBody() data: string,): void {
+    handleEventCreateBand( @ConnectedSocket() client: Socket, @MessageBody() data: NewUserMessageDto ): void {
         console.log(data);
+        const { from, to, message } = data;
+        //* save message to db
+        
+        //* send message to user
+        const requestUserMessageDto =  new RequestUserMessageDto();
+        requestUserMessageDto.event = 'user-message';
+        requestUserMessageDto.from = from;
+        requestUserMessageDto.message = message;
+
+        const findClient = this.users.find(item => item['uuid'] === to);
+        console.log('findClient', findClient['uuid']);
+        
+        if (findClient) {
+            findClient.send(JSON.stringify(requestUserMessageDto));
+        }
         // return data;
     }
 

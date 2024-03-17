@@ -58,31 +58,31 @@ export class AuthService {
 
     public async verifyTokenAndSetOnline( xToken: string ) {
         let verifyToken;
-        
         try {
             verifyToken = await this.jwtService.verifyAsync(
                 xToken, { secret: process.env.JWT_SECRET_KEY }
             );
             // console.log(verifyToken);
+            const { uuid } = verifyToken;
+            if (!uuid) return false;
+
+            const filter = { _id: uuid };
+            const update = { online: true };
+            const user: User = await this.userRepository.findOneAndUpdate(filter, update);
+            if (!user) return false;
+            return user;
         } catch (error) {
-            // console.log(error);
+            console.log(error);
             return null;
         }
-
-        const { uuid } = verifyToken;
-        if (!uuid) return false;
-        const user: User = await this.userRepository.findOne({  _id : uuid });
-        if (!user) return false;
-        user.online = true;
-        await this.userRepository.updateOne(user);
-        return user;
     }
 
     public async disconnect(uuid: string) {
+        const filter = { _id: uuid };
+        const update = { online: false };
+        const user: User = await this.userRepository.findOneAndUpdate(filter, update);
         const findUser: User = await this.userRepository.findOne({  _id : uuid });
         if (!findUser) return false;
-        findUser.online = false;
-        await this.userRepository.updateOne(findUser);
         return true;
     }
 

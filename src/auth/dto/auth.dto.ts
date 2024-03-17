@@ -8,3 +8,20 @@ export class LoginDto {
     @IsNotEmpty()
     readonly password: string;
 }
+
+export class NewUserMessageDto {
+    @IsNotEmpty()
+    readonly from: string;
+
+    @IsNotEmpty()
+    readonly to: string;
+
+    @IsNotEmpty()
+    readonly message: string;
+}
+
+export class RequestUserMessageDto {    
+    message: string;
+    event: string;
+    from: string;
+}
