@@ -7,7 +7,7 @@ import {
 } from '@nestjs/websockets';
 import { Socket } from 'dgram';
 import 'dotenv/config';
-import { NewUserMessageDto, RequestUserMessageDto } from 'src/auth/dto/auth.dto';
+import { NewUserMessageDto, RequestNewUserStatusConnected, RequestUserMessageDto } from 'src/auth/dto/auth.dto';
 import { AuthService } from 'src/auth/services/auth.service';
 import { MessageService } from 'src/messages/services/message.service';
 import { Server } from 'ws';
@@ -63,6 +63,7 @@ export class EventsGateway {
             // console.log(client['uuid']);
             // client.addListener()
             this.users.push(client);
+            this.notificationUserChangedStatusConnected(client['uuid'], true);
             console.log(`Client connected, Total UsersConnected: ${this.users.length}`);
             return true;
         } catch (error) {
@@ -75,6 +76,7 @@ export class EventsGateway {
         // check if public api node
         await this.authService.disconnect(client['uuid']);
         this.users = this.users.filter(item => item['uuid'] !== client['uuid']);
+        this.notificationUserChangedStatusConnected(client['uuid'], false);
         console.log(`Client Disconnected, Total UsersConnected: ${this.users.length}`);
     }
 
@@ -109,5 +111,17 @@ export class EventsGateway {
     //*                                METHODS
     //* =======================================================================================
 
+    public async notificationUserChangedStatusConnected(myUUID: string, connected: boolean) {
+        if ( this.users.length === 0 ) return; 
+        this.users.forEach(user => {
+            if (user['uuid'] !== myUUID ) {
+                const requestUserMessageDto =  new RequestNewUserStatusConnected();
+                requestUserMessageDto.event = 'user-changed-status-connected';
+                requestUserMessageDto.connected = connected;
+                requestUserMessageDto.uuid = user['uuid'];
+                user.send(JSON.stringify(requestUserMessageDto));
+            }
+        });
+    }
 
 }

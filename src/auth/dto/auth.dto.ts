@@ -26,3 +26,8 @@ export class RequestUserMessageDto {
     to: string;
     from: string;
 }
+export class RequestNewUserStatusConnected {    
+    event: string;
+    connected: boolean;
+    uuid: string;
+}
