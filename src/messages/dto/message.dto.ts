@@ -9,7 +9,7 @@ export class LoginDto {
     readonly password: string;
 }
 
-export class NewUserMessageDto {
+export class RequestConversationMessageDto {
     @IsNotEmpty()
     readonly from: string;
 
@@ -17,12 +17,6 @@ export class NewUserMessageDto {
     readonly to: string;
 
     @IsNotEmpty()
-    readonly message: string;
-}
+    readonly skip: number;
 
-export class RequestUserMessageDto {    
-    message: string;
-    event: string;
-    to: string;
-    from: string;
 }

@@ -9,6 +9,7 @@ import { Socket } from 'dgram';
 import 'dotenv/config';
 import { NewUserMessageDto, RequestUserMessageDto } from 'src/auth/dto/auth.dto';
 import { AuthService } from 'src/auth/services/auth.service';
+import { MessageService } from 'src/messages/services/message.service';
 import { Server } from 'ws';
     
 @WebSocketGateway( 
@@ -20,7 +21,10 @@ import { Server } from 'ws';
 )
 export class EventsGateway {
     
-    constructor(private authService: AuthService){ }
+    constructor(
+        private authService: AuthService,
+        private messageService: MessageService,
+    ){ }
 
     @WebSocketServer()
     server: Server;
@@ -30,6 +34,11 @@ export class EventsGateway {
     afterInit() {
         console.warn(`Init WebSocket Server - Port:${process.env.WEBSOCKET_PORT}`);
     }
+
+
+    //* =======================================================================================
+    //*                                HANDLE WSS CONNECTION
+    //* =======================================================================================
 
     // validate Connection with webSocket
     public async handleConnection(@ConnectedSocket() client, req: Request) {
@@ -69,25 +78,36 @@ export class EventsGateway {
         console.log(`Client Disconnected, Total UsersConnected: ${this.users.length}`);
     }
 
+
+
+    //* =======================================================================================
+    //*                                HANDLE EVENTS
+    //* =======================================================================================
+
     @SubscribeMessage('user-message')
-    handleEventCreateBand( @ConnectedSocket() client: Socket, @MessageBody() data: NewUserMessageDto ): void {
-        console.log(data);
+    public async handleEventCreateBand( @ConnectedSocket() client: Socket, @MessageBody() data: NewUserMessageDto ) {
         const { from, to, message } = data;
-        //* save message to db
         
-        //* send message to user
         const requestUserMessageDto =  new RequestUserMessageDto();
         requestUserMessageDto.event = 'user-message';
         requestUserMessageDto.from = from;
+        requestUserMessageDto.to = to;
         requestUserMessageDto.message = message;
-
+        //* save messages in db
+        await this.messageService.saveMessage(requestUserMessageDto)
+        //* send message to user
         const findClient = this.users.find(item => item['uuid'] === to);
-        console.log('findClient', findClient['uuid']);
-        
         if (findClient) {
+            // console.log('findClient', findClient['uuid']);
             findClient.send(JSON.stringify(requestUserMessageDto));
         }
         // return data;
     }
+
+
+    //* =======================================================================================
+    //*                                METHODS
+    //* =======================================================================================
+
 
 }

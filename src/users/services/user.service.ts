@@ -2,7 +2,7 @@ import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
 import { AuthService } from 'src/auth/services/auth.service';
-import { User } from 'src/schemas/user.schema';
+import { User } from 'src/schemas/schemas';
 import { CreateUserDto } from '../dto/user.dto';
 const bcrypt = require('bcryptjs');
 
